@@ -24,20 +24,33 @@ class Player(pygame.sprite.Sprite):
   def __init__(self):
     super(Player, self).__init__()
     self.surf = pygame.Surface((snakeWidth, snakeWidth), pygame.SRCALPHA)
-    #self.surf.fill((18, 107, 4))
-    pygame.gfxdraw.filled_circle(self.surf, 20, 20, 18, (245, 154, 178))
-    #pygame.gfxdraw.aacircle(self.surf, 20, 20, 18, (0,0,0))
-   # pygame.gfxdraw.filled_circle(self.surf, 15, 15, 14, (144, 10, 100)) pygame.SRCALPHA
-
+    self.run = []
+    self.loop = 0
+    self.run.append(pygame.image.load("PlayerFrame1.png"))
+    self.run.append(pygame.image.load("PlayerFrame2.png"))
+    self.run.append(pygame.image.load("PlayerFrame3.png"))
+    self.run.append(pygame.image.load("PlayerFrame4.png"))
+    self.surf =pygame.transform.scale(self.run[self.loop], (100 , 100))
     
     self.rect = self.surf.get_rect(center=(480,100))
     self.yOffset = 0
     self.gravity = 1
+    self.last = pygame.time.get_ticks()
 
 
   # Player movement
-  def update(self, playerkeys, isFlor):
+  def update(self, playerkeys, isFlor,now):
    # self.isGrounded = pygame.sprite.spritecollideany(self,group)
+   # now = pygame.time.get_ticks()
+    
+
+    
+    if self.loop  == len(self.run)-1: 
+      self.loop  = 0
+    if now - self.last > 100: 
+      self.loop = self.loop + 1
+      self.surf = pygame.transform.scale(self.run[self.loop ], (100 , 100))
+      self.last = pygame.time.get_ticks()
 
     if isFlor == True:
       self.yOffset = 0
