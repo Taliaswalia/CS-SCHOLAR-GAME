@@ -1,3 +1,4 @@
+import os
 import pygame
 from player import Player
 from applw import Pong
@@ -24,7 +25,7 @@ clock = pygame.time.Clock()
 
 
 
-
+score = 0
 player = Player()
 #enemy = Enemy()
 screenWidth = 700
@@ -42,8 +43,6 @@ enemies = pygame.sprite.Group()
 allSprites.add(ground)
 allSprites.add(player)
 xPlaces = [100, 400, 260, 300, 140, 490, 10]
-shoot = pygame.mixer.Sound("Bullet shooting.mp3")
-enemyDie = pygame.mixer.Sound("Enemy death sound.mp3")
 bgm = pygame.mixer.Sound("EscapeFromNewYork.mp3")
 
 lives = 5
@@ -56,7 +55,7 @@ x0 = width//2
 y0 = height//2
 
 circleCount = 100
-radiusDiff = 10
+radiusDiff = 0
 stepCol = (255-50)/circleCount
 
 circles = []
@@ -91,8 +90,10 @@ lastEnemy = pygame.time.get_ticks()
 
 while True:
   screen.blit(backGround, (0,0))
-  pygame.mixer.Channel(1).play(pygame.mixer.Sound("EscapeFromNewYork.mp3"), -1)
-
+  bgm.play(-1)
+  font = pygame.font.Font(None, 36)
+  score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+  screen.blit(score_text, (10, 10))
   for i in range(len(circles) - 2, -1, -1):
       circle = circles[i]
 
@@ -123,7 +124,6 @@ while True:
   now = pygame.time.get_ticks()
   if (now - last >= cooldown) and playerkeys[K_SPACE]:
     pong = Pong(player.rect.x, player.rect.y +40)
-    pygame.mixer.Channel(2).play(shoot)
     allSprites.add(pong)
     bullets.add(pong)
     last = pygame.time.get_ticks()
@@ -141,8 +141,8 @@ while True:
   
 
   if pygame.sprite.groupcollide(bullets, enemies, True, True):
+      score += 30
       print(" End the sides")
-      pygame.mixer.Channel(3).play(enemyDie)
   
 
   bullets.update(player)
