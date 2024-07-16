@@ -27,8 +27,8 @@ clock = pygame.time.Clock()
 
 player = Player()
 #enemy = Enemy()
-screenWidth = 500
-screenHeight = 400
+screenWidth = 700
+screenHeight = 600
 isFlor = False
 ground = Ground()
 cooldown = 500
@@ -41,16 +41,77 @@ bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 allSprites.add(ground)
 allSprites.add(player)
-xPlaces = [100, 400, 260, 300, 140]
+xPlaces = [100, 400, 260, 300, 140, 490, 10]
+shoot = pygame.mixer.Sound("Bullet shooting.mp3")
+enemyDie = pygame.mixer.Sound("Enemy death sound.mp3")
+bgm = pygame.mixer.Sound("EscapeFromNewYork.mp3")
 
+lives = 5
+isDead = False
+highscore = 0
+
+width = 700
+height = 600
+x0 = width//2
+y0 = height//2
+
+circleCount = 100
+radiusDiff = 10
+stepCol = (255-50)/circleCount
+
+circles = []
+
+for i in range(circleCount):
+  circles.append([x0, y0, 100, 50])
+
+def draw_circle(circle):
+  angle = 0                   # Angle of movement along the ellipse to draw the next point.
+  step = math.pi / 50    # Step with which the points of the ellipse are drawn.
+
+  circle_x = circle[0]
+  circle_y = circle[1]
+  circle_r = circle[2]
+  circle_color = circle[3]
+
+  while angle < math.pi * 2:
+      x = round(circle_x + math.sin(angle) * circle_r//2)
+      y = round(circle_y + math.cos(angle) * circle_r //2)
+
+      if 0 < x < width and 0 < y < height:
+          pygame.draw.circle(screen,(0, circle_color, circle_color), (x,y), 2)
+
+      angle += step
+
+global rotAngle
+rotAngle = 0
 
 pong = Pong(10,10)
 last = pygame.time.get_ticks()
 lastEnemy = pygame.time.get_ticks()
 
 while True:
+  screen.blit(backGround, (0,0))
+  pygame.mixer.Channel(1).play(pygame.mixer.Sound("EscapeFromNewYork.mp3"), -1)
+
+  for i in range(len(circles) - 2, -1, -1):
+      circle = circles[i]
+
+      circle[2] += radiusDiff
+      circle[3] += stepCol
+      circles[i + 1] = circle
+
+      draw_circle(circle)
+
+  # Calculating X, Y coordinates for a new circle (Changes how much the tunnel rorates)
+  rotAngle += 0.05
+  x = x0 + math.sin(rotAngle) * 1.0
+  y = y0 + math.cos(rotAngle) * 1.0
+
+  # Add a new circle to the beginning of the list
+  circles[0] = [x, y, 100, 50]
+
+
   clock.tick(60)
-  screen.fill((255,255,255))
   playerkeys = pygame.key.get_pressed()
   for event in pygame.event.get():
     if event.type == QUIT:
@@ -61,21 +122,28 @@ while True:
 
   now = pygame.time.get_ticks()
   if (now - last >= cooldown) and playerkeys[K_SPACE]:
-    pong = Pong(player.rect.x - 5, player.rect.y + 10)
+    pong = Pong(player.rect.x, player.rect.y +40)
+    pygame.mixer.Channel(2).play(shoot)
     allSprites.add(pong)
     bullets.add(pong)
     last = pygame.time.get_ticks()
   if (now - lastEnemy >= 500) and len(enemies) <= 5:
-      enemy = Enemy(random.randint(200,300), random.randint(150,200), random.choice(xPlaces))
+      enemy = Enemy(random.randint(300,350), random.randint(300,340), random.choice(xPlaces), 20)
       enemies.add(enemy)
       lastEnemy = pygame.time.get_ticks()
 
-  if pygame.sprite.spritecollide(player, enemies, True):
-      print(" Minus 1 health")
-  if pygame.sprite.groupcollide(bullets, enemies, True, True):
-      print(" End the squares")
+  if (lives == 0):
+      print(" YOU DIED PRESS P to play again")
+      
 
-  screen.blit(backGround, (0,0))
+  if pygame.sprite.spritecollide(player, enemies, True):
+      lives = lives - 1
+  
+
+  if pygame.sprite.groupcollide(bullets, enemies, True, True):
+      print(" End the sides")
+      pygame.mixer.Channel(3).play(enemyDie)
+  
 
   bullets.update(player)
   enemies.update()
@@ -86,16 +154,18 @@ while True:
   else:
       isFlor = False
 
+  for en in enemies:
+     screen.blit(en.surf, en.rect)
+
   for sprite in allSprites:
             screen.blit(sprite.surf, sprite.rect)
   
 
-  for en in enemies:
-    screen.blit(en.surf, en.rect)
+  
           
             
 
-  player.update(playerkeys, isFlor)
+  player.update(playerkeys, isFlor, now)
  
 
   pygame.display.update()
