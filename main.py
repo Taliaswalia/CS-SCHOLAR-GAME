@@ -8,6 +8,8 @@ import pygame.mouse
 from pgzrun import *
 import random as random
 import os
+from Healthbar import Health_Bar
+
 
 from pygame.locals import (
   K_UP,
@@ -54,6 +56,7 @@ isDead = False
 CUSTOM_FONT = "spacegeometryfont.otf"
 font = pygame.font.Font(CUSTOM_FONT, 36)
 highscore = 0
+score = 0
 
 width = 700
 height = 600
@@ -93,6 +96,10 @@ rotAngle = 0
 pong = Pong(10,10)
 last = pygame.time.get_ticks()
 lastEnemy = pygame.time.get_ticks()
+#THIS PART HERE USE IT FOR HEALTH BAR AAAAAAAAAAA
+health = 100
+health_bar = Health_Bar(580, 20)
+allSprites.add(health_bar)
 start_game = False
 
 # Constants
@@ -206,6 +213,7 @@ while not start_game:
                     start_game = True
 
         screen.blit(background, (0, 0))
+        score = 0
 
 
         # Update and draw floating images
@@ -223,11 +231,7 @@ while not start_game:
         clock.tick(30)  # Slower frame rate
 
     # Placeholder for the next screen
-screen.fill(BG_COLOR)
-draw_text("game has started!", font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-pygame.display.flip()
-pygame.time.wait(2000)
-    
+
     
 
 print(start_game)
@@ -239,7 +243,10 @@ print(start_game)
 while start_game:
   clock.tick(60)
   screen.blit(background, (0,0))
+  #score = 0
   bgm.play(-1)
+  #THIS PART HERE USE IT FOR HEALTH BAR AAAAAAAAAA
+  health_bar.update(health) #initializes health bar
 
 
   for i in range(len(circles) - 2, -1, -1):
@@ -281,20 +288,25 @@ while start_game:
 
        lastEnemy = pygame.time.get_ticks()
 
-  if (lives == 0):
-      print(" YOU DIED PRESS P to play again")
+  if (health == 0):
+      #print(" YOU DIED PRESS P to play again")
+      start_game = False
       
   for en in enemies:
     if player.rect.x - en.xpos < en.size and player.rect.y - en.ypos < en.size:
         if pygame.sprite.spritecollide(player, enemies, True):
-            lives = lives - 1
+            health -= 10
+
+
   
 
   if pygame.sprite.groupcollide(bullets, enemies, True, True):
       print(" End the sides")
-      highscore += 100
+      score += 100
 
-  highscore += 1 
+  score += 1 
+  if highscore < score:
+      highscore = score
 
   bullets.update(player)
   enemies.update()
