@@ -132,7 +132,17 @@ def main():
         pygame.display.flip()
         clock.tick(30)  # Slower frame rate
 
-    # Placeholder for the next screen
+    #           LOOK HERE
+    #           LOOK HERE
+    #           LOOK HERE
+    #           LOOK HERE
+    #           LOOK HERE
+    # PLACEHOLDER FOR THE NEXT SCREEN
+    #           LOOK HERE
+    #           LOOK HERE
+    #           LOOK HERE
+    #           LOOK HERE
+    #           LOOK HERE
     screen.fill(BG_COLOR)
     draw_text("game has started!", font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
     pygame.display.flip()
