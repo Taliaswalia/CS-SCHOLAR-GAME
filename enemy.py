@@ -1,7 +1,7 @@
 import pygame
 import math
 import random
-from hitbox import Hitbox
+
 
 
 screenWidth = 700
