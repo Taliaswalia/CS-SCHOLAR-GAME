@@ -12,22 +12,3 @@ class Health_Bar(pygame.sprite.Sprite):
         self.health = health
         self.surf.fill((191, 29, 29))  # Red color for health bar background
         pygame.draw.rect(self.surf, (32, 128, 57), (0, 0, self.health, 20))  # Green part of the health bar# import pygame
- 
-# class Health_Bar(pygame.sprite.Sprite):
-#     def __init__(self, x, y):
-#         super().__init__()
-#         self.surf = pygame.Surface((100, 40))
-#         Heart1 = ("full_heart.png")
-#         Heart2 = ("half_heart.png")
-#         self.health = [Heart1, Heart2]
-#         pygame.surf.load (self.health)
-#         pygame.bli
-#         self.surf = self.health[0]
-        
-
-
-#     def update(self):
-#         for heart in self.health:
-#             if lives <= 2:
-#                 self.health.pop (heart)
-#                 lives = 2
