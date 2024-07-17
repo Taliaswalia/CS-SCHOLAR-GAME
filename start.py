@@ -6,32 +6,33 @@ import os
 pygame.init()
 
 # Constants
-SCREEN_WIDTH, SCREEN_HEIGHT = 400, 300
+SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
 BG_COLOR = (0, 0, 0)
 
 # Load assets
 CUSTOM_FONT = "spacegeometryfont.otf"
 BACKGROUND_IMAGE = "background.png"
 LOGO_IMAGE = "logo.png"
-LOGO_WIDTH = 250
+LOGO_WIDTH = 350
 
 # Screen setup
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Load custom assets
 background = pygame.image.load(BACKGROUND_IMAGE).convert()
+background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 logo_original = pygame.image.load(LOGO_IMAGE).convert_alpha()
 
 # Resize logo image
 logo_height = int(LOGO_WIDTH / logo_original.get_width() * logo_original.get_height())
 logo = pygame.transform.scale(logo_original, (LOGO_WIDTH, logo_height))
 
-# Load the background and logo images
+# Load the background images
 background_images = [pygame.image.load(f"{i}.png").convert_alpha() for i in range(3, 12)]
 
 # Load custom font
 font_path = os.path.join(os.path.dirname(__file__), CUSTOM_FONT)
-font = pygame.font.Font(font_path, 36)
+font = pygame.font.Font(font_path, 48)
 
 # Function to draw text in the center of the screen
 def draw_text(text, font, color, surface, x, y):
@@ -45,7 +46,7 @@ def create_floating_images(num_images):
     for _ in range(num_images):
         img = random.choice(background_images)
         aspect_ratio = img.get_width() / img.get_height()
-        size = random.randint(20, 80)
+        size = random.randint(50, 150)
         new_width = int(size * aspect_ratio)
         img = pygame.transform.scale(img, (new_width, size))
 
@@ -79,7 +80,7 @@ def update_floating_images(images):
             # Choose a new image, size, and speed
             new_img = random.choice(background_images)
             aspect_ratio = new_img.get_width() / new_img.get_height()
-            size = random.randint(20, 80)  # Increased size range
+            size = random.randint(50, 150)
             new_width = int(size * aspect_ratio)
             new_img = pygame.transform.scale(new_img, (new_width, size))
 
@@ -95,15 +96,15 @@ def update_floating_images(images):
             rect.x = start_x
             rect.y = start_y
 
-            #  Random speed
-            speed = [random.uniform(-2.5, 2.5), random.uniform(-2.5, 2.5)]  # Increased speed range
+            # Random speed
+            speed = [random.uniform(-2.5, 2.5), random.uniform(-2.5, 2.5)]
 
             images[i] = (new_img, rect, speed)
 
 # Main loop
 def main():
     clock = pygame.time.Clock()
-    floating_images = create_floating_images(15)  # Increased number of images
+    floating_images = create_floating_images(25)
     start_game = False
 
     while not start_game:
@@ -123,17 +124,17 @@ def main():
             screen.blit(img, rect)
 
         # Draw the logo centered at the top of the screen
-        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 2, 20))
+        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 2, 80))
 
         # Draw the text using custom font
-        draw_text("Press SPACE to start", font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 80)
+        draw_text("press SPACE to start", font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100)
 
         pygame.display.flip()
         clock.tick(30)  # Slower frame rate
 
     # Placeholder for the next screen
     screen.fill(BG_COLOR)
-    draw_text("Game has started!", font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+    draw_text("game has started!", font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
     pygame.display.flip()
     pygame.time.wait(2000)
 
