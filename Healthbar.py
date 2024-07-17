@@ -10,8 +10,8 @@ class Health_Bar(pygame.sprite.Sprite):
 
     def update(self, health):
         self.health = health
-        self.surf.fill((255, 0, 0))  # Red color for health bar background
-        pygame.draw.rect(self.surf, (0, 255, 0), (0, 0, self.health, 20))  # Green part of the health bar# import pygame
+        self.surf.fill((191, 29, 29))  # Red color for health bar background
+        pygame.draw.rect(self.surf, (32, 128, 57), (0, 0, self.health, 20))  # Green part of the health bar# import pygame
  
 # class Health_Bar(pygame.sprite.Sprite):
 #     def __init__(self, x, y):
