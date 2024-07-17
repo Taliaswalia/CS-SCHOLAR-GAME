@@ -1,4 +1,3 @@
-import os
 import pygame
 from player import Player
 from applw import Pong
@@ -8,8 +7,8 @@ import math
 import pygame.mouse
 from pgzrun import *
 import random as random
+import os
 
-# Ask what we should do for health bar like 3 lives or idk
 from pygame.locals import (
   K_UP,
   K_DOWN,
@@ -25,14 +24,15 @@ clock = pygame.time.Clock()
 
 
 
-score = 0
+
 player = Player()
-#enemy = Enemy()
+
 screenWidth = 700
 screenHeight = 600
-isFlor = False
+isFlor = False # dont need anymore
 ground = Ground()
-cooldown = 500
+cooldown = 500 # for bullets
+
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 backGround = pygame.image.load('bg RESIZED.png')
 backGround = pygame.transform.scale(backGround, (screenWidth, screenHeight))
@@ -42,11 +42,17 @@ bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 allSprites.add(ground)
 allSprites.add(player)
-xPlaces = [100, 400, 260, 300, 140, 490, 10]
-bgm = pygame.mixer.Sound("EscapeFromNewYork.mp3")
+
+xPlaces = [100, 400, 260, 300, 140, 490, 10] # the x value that the enemy will go to
+
+bgm = pygame.mixer.Sound("EscapeFromNewYork.mp3") # music
+
 
 lives = 5
 isDead = False
+
+CUSTOM_FONT = "spacegeometryfont.otf"
+font = pygame.font.Font(CUSTOM_FONT, 36)
 highscore = 0
 
 width = 700
@@ -55,7 +61,7 @@ x0 = width//2
 y0 = height//2
 
 circleCount = 100
-radiusDiff = 0
+radiusDiff = 10
 stepCol = (255-50)/circleCount
 
 circles = []
@@ -88,12 +94,14 @@ pong = Pong(10,10)
 last = pygame.time.get_ticks()
 lastEnemy = pygame.time.get_ticks()
 
+
+
 while True:
+  clock.tick(60)
   screen.blit(backGround, (0,0))
   bgm.play(-1)
-  font = pygame.font.Font(None, 36)
-  score_text = font.render(f'Score: {score}', True, (255, 255, 255))
-  screen.blit(score_text, (10, 10))
+
+
   for i in range(len(circles) - 2, -1, -1):
       circle = circles[i]
 
@@ -112,7 +120,6 @@ while True:
   circles[0] = [x, y, 100, 50]
 
 
-  clock.tick(60)
   playerkeys = pygame.key.get_pressed()
   for event in pygame.event.get():
     if event.type == QUIT:
@@ -124,13 +131,15 @@ while True:
   now = pygame.time.get_ticks()
   if (now - last >= cooldown) and playerkeys[K_SPACE]:
     pong = Pong(player.rect.x, player.rect.y +40)
+    
     allSprites.add(pong)
     bullets.add(pong)
     last = pygame.time.get_ticks()
-  if (now - lastEnemy >= 500) and len(enemies) <= 5:
-      enemy = Enemy(random.randint(300,350), random.randint(300,340), random.choice(xPlaces), 20)
-      enemies.add(enemy)
-      lastEnemy = pygame.time.get_ticks()
+  if (now - lastEnemy >= 1000) and len(enemies) <= 5:
+       enemy = Enemy(random.randint(300,350), random.randint(300,340), random.choice(xPlaces), 20)
+       enemies.add(enemy)
+
+       lastEnemy = pygame.time.get_ticks()
 
   if (lives == 0):
       print(" YOU DIED PRESS P to play again")
@@ -141,9 +150,10 @@ while True:
   
 
   if pygame.sprite.groupcollide(bullets, enemies, True, True):
-      score += 30
       print(" End the sides")
-  
+      highscore += 100
+
+  highscore += 1 
 
   bullets.update(player)
   enemies.update()
@@ -166,6 +176,8 @@ while True:
             
 
   player.update(playerkeys, isFlor, now)
+  score_text = font.render(f'Score: {highscore}', True, (255, 255, 255))
+  screen.blit(score_text, (10, 10))
  
 
   pygame.display.update()
