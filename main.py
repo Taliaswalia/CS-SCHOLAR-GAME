@@ -48,6 +48,7 @@ allSprites.add(player)
 xPlaces = [100, 400, 260, 300, 140, 490, 10] # the x value that the enemy will go to
 
 bgm = pygame.mixer.Sound("EscapeFromNewYork.mp3") # music
+game = pygame.mixer.Sound("MiamiChee.mp3") 
 
 
 lives = 5
@@ -98,7 +99,7 @@ pong = Pong(10,10)
 last = pygame.time.get_ticks()
 lastEnemy = pygame.time.get_ticks()
 #THIS PART HERE USE IT FOR HEALTH BAR AAAAAAAAAAA
-health = 100
+health = 50
 health_bar = Health_Bar(580, 20)
 allSprites.add(health_bar)
 start_game = False
@@ -123,7 +124,7 @@ def return_to_menu():
     startMenu = True
     playerDead = False
     start_game = False
-    health = 100
+    health = 50
     return startMenu
 
 # Load custom assets
@@ -213,8 +214,8 @@ def show_credits():
         "Jerico, Dean, Ivy, Munisa, Raani",
         "Sally, Corey, Natalia",
         "OUR QUEEN",
-        "ALEYAH",
-        "Special Thanks: Jane Doe",
+        "Doctor Miss ALEYAH"
+       # "Special Thanks: Jane Doe",
     ]
     credits_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
     credits_overlay.fill((0, 0, 0, 100))
@@ -388,12 +389,13 @@ while True:
     # last = pygame.time.get_ticks()
     # lastEnemy = pygame.time.get_ticks()
     # #THIS PART HERE USE IT FOR HEALTH BAR AAAAAAAAAAA
-    health = 100
+    health = 50
     # health_bar = Health_Bar(580, 20)
     # allSprites.add(health_bar)
     # start_game = False
     # playerDead = False
     # startMenu = True
+    
 
     if startMenu:
         for event in pygame.event.get():
@@ -405,7 +407,7 @@ while True:
                     start_game = True
                     startMenu = False
                     playerDead = False
-
+        bgm.play()
         screen.blit(background, (0, 0))
         score = 0
 
@@ -420,11 +422,12 @@ while True:
         clock.tick(60)
 
     elif start_game:
-        health = 100
+        health = 50
         while start_game and not playerDead and not startMenu:
             clock.tick(60)
             screen.blit(background, (0, 0))
             health_bar.update(health)
+            game.play(-1)
             
             for i in range(len(circles) - 2, -1, -1):
                 circle = circles[i]
