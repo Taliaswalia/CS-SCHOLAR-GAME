@@ -122,6 +122,8 @@ def return_to_menu():
     print('WAAAT')
     startMenu = True
     playerDead = False
+    start_game = False
+    health = 100
     return startMenu
 
 # Load custom assets
@@ -149,8 +151,10 @@ PLAYER_SCORE = 12345  # Example score
 # Load assets
 
 ROBOTO = "Roboto-Light.ttf"
-LOGO_IMAGE = "gameover.png"
-LOGO_WIDTH = 450
+# LOGO_IMAGE = "gameover.png"
+# LOGO_WIDTH = 450
+gameover = "gameover.png"
+gameoverWidth = 450
 
 # Button Colors
 BUTTON_COLORS = [(56, 93, 109), (53, 80, 112), (81, 85, 117), (109, 89, 122), (181, 101, 118)]
@@ -162,11 +166,13 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # Load custom assets
 background = pygame.image.load(BACKGROUND_IMAGE).convert()
 background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-logo_original = pygame.image.load(LOGO_IMAGE).convert_alpha()
+#logo_original = pygame.image.load(gameover).convert_alpha()
+gameover_original = pygame.image.load(gameover).convert_alpha()
 
 # Resize logo image
-logo_height = int(LOGO_WIDTH / logo_original.get_width() * logo_original.get_height())
-logo = pygame.transform.scale(logo_original, (LOGO_WIDTH, logo_height))
+#logo_height = int(gameoverWidth / logo_original.get_width() * logo_original.get_height())
+gameover_height = int(gameoverWidth / gameover_original.get_width() * gameover_original.get_height())
+gameover = pygame.transform.scale(gameover_original, (gameoverWidth, gameover_height))
 
 # Load custom font
 font_path = os.path.join(os.path.dirname(__file__), CUSTOM_FONT)
@@ -382,7 +388,7 @@ while True:
     # last = pygame.time.get_ticks()
     # lastEnemy = pygame.time.get_ticks()
     # #THIS PART HERE USE IT FOR HEALTH BAR AAAAAAAAAAA
-    # health = 100
+    health = 100
     # health_bar = Health_Bar(580, 20)
     # allSprites.add(health_bar)
     # start_game = False
@@ -398,6 +404,7 @@ while True:
                 if event.key == pygame.K_SPACE:
                     start_game = True
                     startMenu = False
+                    playerDead = False
 
         screen.blit(background, (0, 0))
         score = 0
@@ -413,6 +420,7 @@ while True:
         clock.tick(60)
 
     elif start_game:
+        health = 100
         while start_game and not playerDead and not startMenu:
             clock.tick(60)
             screen.blit(background, (0, 0))
@@ -461,7 +469,7 @@ while True:
                 score += 100
 
             score += 1
-            if highscore < score:
+            if highscore <= score:
                 highscore = score
 
             bullets.update(player)
@@ -476,15 +484,17 @@ while True:
                 screen.blit(sprite.surf, sprite.rect)
 
             player.update(playerkeys, hasFloored, now)
-            score_text = font.render(f'Score: {highscore}', True, (255, 255, 255))
+            score_text = font.render(f'Score: {score}', True, (255, 255, 255))
             screen.blit(score_text, (10, 10))
 
             pygame.display.update()
 
     elif playerDead:
         screen.blit(background, (0, 0))
-        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 2, 50))
-        draw_text(f"Score: {PLAYER_SCORE}", score_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, 215)
+        screen.blit(gameover, (SCREEN_WIDTH // 2 - gameover.get_width() // 2, 50))
+        draw_text(f"Score: {score}", score_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, 250)
+        scoreText = font.render(f'Highscore: {highscore}', True, (255, 255, 255))
+        screen.blit(scoreText, (10, 10))
 
         buttons = [
             ("Return to Menu", return_to_menu, BUTTON_COLORS[1]),
