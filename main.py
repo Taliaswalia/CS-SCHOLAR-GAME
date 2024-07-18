@@ -69,6 +69,7 @@ stepCol = (255-50)/circleCount
 
 circles = []
 
+
 for i in range(circleCount):
   circles.append([x0, y0, 100, 50])
 
@@ -101,6 +102,8 @@ health = 100
 health_bar = Health_Bar(580, 20)
 allSprites.add(health_bar)
 start_game = False
+playerDead = False
+startMenu = True
 
 # Constants
 SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
@@ -114,6 +117,12 @@ LOGO_WIDTH = 350
 
 # Screen setup
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+def return_to_menu():
+    global startMenu
+    print('WAAAT')
+    startMenu = True
+    playerDead = False
+    return startMenu
 
 # Load custom assets
 background = pygame.image.load(BACKGROUND_IMAGE).convert()
@@ -130,6 +139,151 @@ background_images = [pygame.image.load(f"{i}.png").convert_alpha() for i in rang
 # Load custom font
 font_path = os.path.join(os.path.dirname(__file__), CUSTOM_FONT)
 font = pygame.font.Font(CUSTOM_FONT, 48)
+
+
+# Constants
+SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
+BG_COLOR = (0, 0, 0)
+PLAYER_SCORE = 12345  # Example score
+
+# Load assets
+
+ROBOTO = "Roboto-Light.ttf"
+LOGO_IMAGE = "gameover.png"
+LOGO_WIDTH = 450
+
+# Button Colors
+BUTTON_COLORS = [(56, 93, 109), (53, 80, 112), (81, 85, 117), (109, 89, 122), (181, 101, 118)]
+BUTTON_ALPHA = 128  # Transparency level (0-255)
+
+# Screen setup
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Load custom assets
+background = pygame.image.load(BACKGROUND_IMAGE).convert()
+background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+logo_original = pygame.image.load(LOGO_IMAGE).convert_alpha()
+
+# Resize logo image
+logo_height = int(LOGO_WIDTH / logo_original.get_width() * logo_original.get_height())
+logo = pygame.transform.scale(logo_original, (LOGO_WIDTH, logo_height))
+
+# Load custom font
+font_path = os.path.join(os.path.dirname(__file__), CUSTOM_FONT)
+roboto_path = os.path.join(os.path.dirname(__file__), ROBOTO)
+font = pygame.font.Font(CUSTOM_FONT, 48)
+button_font = pygame.font.Font(CUSTOM_FONT, 36)
+score_font = pygame.font.Font(CUSTOM_FONT, 48)
+
+# Function to draw text in the center of the screen
+def draw_text(text, font, color, surface, x, y):
+    text_obj = font.render(text, True, color)
+    text_rect = text_obj.get_rect(center=(x, y))
+    surface.blit(text_obj, text_rect)
+
+# Function to create a button with a translucent background
+def draw_button(text, font, color, surface, x, y, width, height, bg_color):
+    button_rect = pygame.Surface((width, height), pygame.SRCALPHA)
+    button_rect.fill((*bg_color, BUTTON_ALPHA))
+    surface.blit(button_rect, (x - width // 2, y - height // 2))
+    draw_text(text, font, color, surface, x, y)
+    return pygame.Rect(x - width // 2, y - height // 2, width, height)
+
+# Function to show the credits page
+def show_credits():
+    custom_credits_font = pygame.font.Font(CUSTOM_FONT, 48)
+    credits_font = pygame.font.Font(ROBOTO, 36)
+    credits = [
+        "CREDITS",
+        "Team Lead: Khuslen",
+        "Music: Mike Taylor",
+        "Artwork: Raani, Paul, Corey",
+        "Programming Lead: Natalia",
+        "Design Team: Ivy, Munisa",
+        "Coders: Dean, Jerico",
+        "Tech Support: Sally",
+        "Supervisor: Aleyah",
+        "Honorary BADDIES: Khuslen, Paul,",
+        "Jerico, Dean, Ivy, Munisa, Raani",
+        "Sally, Corey, Natalia",
+        "OUR QUEEN",
+        "ALEYAH",
+        "Special Thanks: Jane Doe",
+    ]
+    credits_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    credits_overlay.fill((0, 0, 0, 100))
+    screen.blit(credits_overlay, (0, 0))
+
+    credit_y = SCREEN_HEIGHT
+
+    while credit_y > -len(credits) * 50:
+        screen.blit(credits_overlay, (0, 0))
+        for i, line in enumerate(credits):
+            y_pos = credit_y + i * 50
+            if i == 0:
+                draw_text(line, custom_credits_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, y_pos)
+            else:
+                draw_text(line, credits_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, y_pos)
+
+        close_button = draw_button("Close", button_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100, 200, 50, BUTTON_COLORS[4])
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if close_button.collidepoint(event.pos):
+                        return True
+
+        credit_y -= 1  # Speed of scrolling
+        pygame.time.wait(10)  # Delay to control speed
+
+    return True
+
+# Function to show the scores page
+def show_scores():
+    scores_font = pygame.font.Font(CUSTOM_FONT, 36)
+    scores = [
+        "HIGH SCORES",
+        "Player 1: 5000",
+        "Player 2: 4500",
+        "Player 3: 4000",
+    ]
+    scores_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    scores_overlay.fill((0, 0, 0, 180))
+    screen.blit(scores_overlay, (0, 0))
+
+    for i, line in enumerate(scores):
+        draw_text(line, scores_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, 100 + i * 50)
+
+    close_button = draw_button("Close", button_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100, 200, 50, BUTTON_COLORS[3])
+    pygame.display.flip()
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if close_button.collidepoint(event.pos):
+                        waiting = False
+    return True
+
+# Main loop
+
+clock = pygame.time.Clock()
+button_y_start = 315
+button_spacing = 60
+
+                                
+
+# if __name__ == "__main__":
+#     main()
+#     pygame.quit()
 
 # Function to draw text in the center of the screen
 def draw_text(text, font, color, surface, x, y):
@@ -201,138 +355,159 @@ def update_floating_images(images):
 # Main loop
 clock = pygame.time.Clock()
 floating_images = create_floating_images(25)
-while not start_game:
-    
+
+
+while True:
+    # isDead = False
+
+    # CUSTOM_FONT = "spacegeometryfont.otf"
+    # font = pygame.font.Font(CUSTOM_FONT, 36)
+    # highscore = 0
+    # score = 0
+
+    # width = 700
+    # height = 600
+    # x0 = width//2
+    # y0 = height//2
+
+    # circleCount = 100
+    # radiusDiff = 10
+    # stepCol = (255-50)/circleCount
+
+    # circles = []
+    # clock = pygame.time.Clock()
+    # button_y_start = 315
+    # button_spacing = 60
+    # pong = Pong(10,10)
+    # last = pygame.time.get_ticks()
+    # lastEnemy = pygame.time.get_ticks()
+    # #THIS PART HERE USE IT FOR HEALTH BAR AAAAAAAAAAA
+    # health = 100
+    # health_bar = Health_Bar(580, 20)
+    # allSprites.add(health_bar)
+    # start_game = False
+    # playerDead = False
+    # startMenu = True
+
+    if startMenu:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                
+                exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    print("WORD")
                     start_game = True
+                    startMenu = False
 
         screen.blit(background, (0, 0))
         score = 0
 
-
-        # Update and draw floating images
         update_floating_images(floating_images)
         for img, rect, _ in floating_images:
             screen.blit(img, rect)
 
-        # Draw the logo centered at the top of the screen
         screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 2, 80))
-
-        # Draw the text using custom font
         draw_text("press SPACE to start", font, (255, 255, 255), screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100)
 
         pygame.display.flip()
-        clock.tick(30)  # Slower frame rate
+        clock.tick(60)
 
-    # Placeholder for the next screen
-
-    
-
-print(start_game)
-# if __name__ == "__main__":
-#     main()
-#     pygame.quit()
-
-
-while start_game:
-  clock.tick(60)
-  screen.blit(background, (0,0))
-  #score = 0
-  bgm.play(-1)
-  #THIS PART HERE USE IT FOR HEALTH BAR AAAAAAAAAA
-  health_bar.update(health) #initializes health bar
-
-
-  for i in range(len(circles) - 2, -1, -1):
-      circle = circles[i]
-
-      circle[2] += radiusDiff
-      circle[3] += stepCol
-      circles[i + 1] = circle
-
-      draw_circle(circle)
-
-  # Calculating X, Y coordinates for a new circle (Changes how much the tunnel rorates)
-  rotAngle += 0.05
-  x = x0 + math.sin(rotAngle) * 1.0
-  y = y0 + math.cos(rotAngle) * 1.0
-
-  # Add a new circle to the beginning of the list
-  circles[0] = [x, y, 100, 50]
-
-
-  playerkeys = pygame.key.get_pressed()
-  for event in pygame.event.get():
-    if event.type == QUIT:
-      pygame.quit()
-
-  playerkeys = pygame.key.get_pressed()
-  hasFloored = pygame.sprite.collide_rect(player, ground)
-
-  now = pygame.time.get_ticks()
-  if (now - last >= cooldown) and playerkeys[K_SPACE]:
-    pong = Pong(player.rect.x, player.rect.y +40)
-    
-    allSprites.add(pong)
-    bullets.add(pong)
-    last = pygame.time.get_ticks()
-  if (now - lastEnemy >= 1000) and len(enemies) <= 5:
-       enemy = Enemy(random.randint(300,350), random.randint(300,340), random.choice(xPlaces), 20)
-       enemies.add(enemy)
-
-       lastEnemy = pygame.time.get_ticks()
-
-  if (health == 0):
-      #print(" YOU DIED PRESS P to play again")
-      start_game = False
-      
-  for en in enemies:
-    if player.rect.x - en.xpos < en.size and player.rect.y - en.ypos < en.size:
-        if pygame.sprite.spritecollide(player, enemies, True):
-            health -= 10
-
-
-  
-
-  if pygame.sprite.groupcollide(bullets, enemies, True, True):
-      print(" End the sides")
-      score += 100
-
-  score += 1 
-  if highscore < score:
-      highscore = score
-
-  bullets.update(player)
-  enemies.update()
-
-
-  if hasFloored:
-      isFlor = True
-  else:
-      isFlor = False
-
-  for en in enemies:
-     screen.blit(en.surf, en.rect)
-
-  for sprite in allSprites:
-            screen.blit(sprite.surf, sprite.rect)
-  
-
-  
-          
+    elif start_game:
+        while start_game and not playerDead and not startMenu:
+            clock.tick(60)
+            screen.blit(background, (0, 0))
+            health_bar.update(health)
             
+            for i in range(len(circles) - 2, -1, -1):
+                circle = circles[i]
+                circle[2] += radiusDiff
+                circle[3] += stepCol
+                circles[i + 1] = circle
+                draw_circle(circle)
 
-  player.update(playerkeys, isFlor, now)
-  score_text = font.render(f'Score: {highscore}', True, (255, 255, 255))
-  screen.blit(score_text, (10, 10))
- 
+            rotAngle += 0.05
+            x = x0 + math.sin(rotAngle) * 1.0
+            y = y0 + math.cos(rotAngle) * 1.0
+            circles[0] = [x, y, 100, 50]
 
-  pygame.display.update()
- # while moving == True:
-  # player.rect.x += 1
+            playerkeys = pygame.key.get_pressed()
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    exit()
+
+            now = pygame.time.get_ticks()
+            if (now - last >= cooldown) and playerkeys[K_SPACE]:
+                pong = Pong(player.rect.x, player.rect.y + 40)
+                allSprites.add(pong)
+                bullets.add(pong)
+                last = pygame.time.get_ticks()
+
+            if (now - lastEnemy >= 1000) and len(enemies) <= 5:
+                enemy = Enemy(random.randint(300, 350), random.randint(300, 340), random.choice(xPlaces), 20)
+                enemies.add(enemy)
+                lastEnemy = pygame.time.get_ticks()
+
+            if health == 0:
+                start_game = False
+                playerDead = True
+
+            for en in enemies:
+                if player.rect.x - en.xpos < en.size and player.rect.y - en.ypos < en.size:
+                    if pygame.sprite.spritecollide(player, enemies, True):
+                        health -= 10
+
+            if pygame.sprite.groupcollide(bullets, enemies, True, True):
+                score += 100
+
+            score += 1
+            if highscore < score:
+                highscore = score
+
+            bullets.update(player)
+            enemies.update()
+
+            hasFloored = pygame.sprite.collide_rect(player, ground)
+
+            for en in enemies:
+                screen.blit(en.surf, en.rect)
+
+            for sprite in allSprites:
+                screen.blit(sprite.surf, sprite.rect)
+
+            player.update(playerkeys, hasFloored, now)
+            score_text = font.render(f'Score: {highscore}', True, (255, 255, 255))
+            screen.blit(score_text, (10, 10))
+
+            pygame.display.update()
+
+    elif playerDead:
+        screen.blit(background, (0, 0))
+        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 2, 50))
+        draw_text(f"Score: {PLAYER_SCORE}", score_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, 215)
+
+        buttons = [
+            ("Return to Menu", return_to_menu, BUTTON_COLORS[1]),
+            ("Credits", show_credits, BUTTON_COLORS[0]),
+            ("Scores", show_scores, BUTTON_COLORS[2])
+        ]
+
+        for i, (text, action, color) in enumerate(buttons):
+            y_pos = button_y_start + i * button_spacing
+            button_rect = draw_button(text, button_font, (255, 255, 255), screen, SCREEN_WIDTH // 2, y_pos, 250, 50, color)
+            buttons[i] = (button_rect, action)
+
+        pygame.display.flip()
+        clock.tick(30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    for button_rect, action in buttons:
+                        if button_rect.collidepoint(event.pos):
+                            action()
+
+    
